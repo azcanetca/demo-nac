@@ -1,0 +1,341 @@
+ {/* <Tabs handleTabChange={handleTabChange} >
+              {data?.currentctg?.map((category) => (
+                <Tabs.Panel key={category?.id} title={category?.name_en}>
+                  <div className="pt-[50px]">
+                    <p
+                      className="font-[700] text-[35px] lg:text-[20px] md:text-[16px] tracking-[0.7px] text-[#212529]"
+                      dangerouslySetInnerHTML={{
+                        __html: category && category?.title_en,
+                      }}
+                    ></p>
+                    <div
+                      className="tab-content lg:text-[13px] "
+                      dangerouslySetInnerHTML={{
+                        __html: category && category?.text_en,
+                      }}
+                    ></div>
+                  </div>
+                 
+                </Tabs.Panel>
+              ))}
+            </Tabs> */}
+
+
+"use client";
+import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
+import Breadcrumb from "../Breadcrumb/Breadcrumb";
+import Image from "next/image";
+
+import { CopyNotification } from "../CopyNotification/CopyNotification";
+
+import Transition from "../Transition/Transition";
+
+import CurrentIsusesTab from "./CurrentIsusesTab";
+import CurrentIsusesPanels from "./CurrentIsusesPanels";
+
+const CurrentIssuesPage = ({ params }) => {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const [showNotification, setShowNotification] = useState(false);
+  const [copiedLink, setCopiedLink] = useState("");
+
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_API}/current-isuses/${params?.slug}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setData(data);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
+
+ 
+  
+
+  const pageNames = [
+    { name: "Home page", link: "/" },
+    { name: "Current Issues", link: "#" },
+  ];
+
+  const CopyLinkTitle = () => {
+    const link = window?.location?.href;
+    setCopiedLink(link);
+    setShowNotification(true);
+    navigator?.clipboard?.writeText(link);
+    setTimeout(() => {
+      setShowNotification(false);
+    }, 3000);
+  };
+
+  // if (loading || !data?.currentctg) return <Loading />;
+
+  return (
+    <Transition>
+      <Breadcrumb pageNames={pageNames} />
+      <Image
+        src={data?.currentIsuses}
+        width={1000}
+        height={300}
+        alt="cover_img"
+        className="w-full h-[350px] lg:h-[250px] object-cover"
+      />
+      <div className="px-[150px] 2xl:px-[50px] lg:px-[20px] min-h-[65vh]">
+        <div className="mt-[20px]">
+          <Tabs>
+            <TabList className="mb-5">
+              {data?.currentctg?.map((cur) => (
+                <CurrentIsusesTab data={cur} key={cur?.id} />
+              ))}
+            </TabList>
+            <TabPanels>
+              {data?.currentctg?.map((item) => (
+                <CurrentIsusesPanels
+                  data={item}
+                  key={item?.id}
+                  CopyLinkTitle={CopyLinkTitle}
+                />
+              ))}
+            </TabPanels>
+          </Tabs>
+        </div>
+        {showNotification && <CopyNotification link={copiedLink} />}
+      </div>
+    </Transition>
+  );
+};
+
+export default CurrentIssuesPage;
+
+
+
+
+
+"use client";
+import { useEffect, useState } from "react";
+
+const Tabs = ({ children, handleTabChange }) => {
+  const [activeTab, setActiveTab] = useState(0);
+  const [fadeOutClass, setFadeOutClass] = useState("");
+
+  const handleChangeTab = (i) => {
+    setFadeOutClass("fadeOutNoa");
+    setTimeout(() => {
+      setActiveTab(i);
+      setFadeOutClass("");
+      if (handleTabChange && children?.[i]?.props) {
+        handleTabChange(children[i].props); 
+        console.log('test',children[i].props?.title);
+      }
+    }, 300);
+  };
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setFadeOutClass("");
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [fadeOutClass]);
+
+  
+  
+
+  return (
+    <>
+      <div className="flex items-center gap-[15px] flex-wrap">
+        {children?.map((child, i) => (
+          <button
+            type="button"
+            key={i}
+            onClick={() => handleChangeTab(i)}
+            className={`p-[10px] lg:p-[5px] rounded-[5px] uppercase text-[16px] lg:text-[14px] font-[600] min-w-[22%] ${
+              activeTab === i
+                ? "font-[700] bg-[#ec5a44] text-white shadow-[0_4px_13px_rgba(236,90,68,.6),0_2px_3px_rgba(236,90,68,.41)]"
+                : "border bg-[#759acd] border-[#759acd] text-white  "
+            }
+            `}
+          >
+            {child?.props?.title}
+          </button>
+        ))}
+      </div>
+      <div className={`${fadeOutClass}`}>{children?.[activeTab]}</div>
+    </>
+  );
+};
+
+// Alt bileşeni tanımlayın
+Tabs.Panel = function ({ children }) {
+  return <>{children}</>;
+};
+
+export default Tabs;
+
+
+
+
+
+
+//  <div className="w-full flex justify-center">
+//             <div className="hidden xl:flex">
+//               <button
+//                 onClick={openMenu}
+//                 className="flex h-full px-[18px] xl:px-[10px] cursor-pointer  uppercase   bg-[#ec5a44] xl:bg-transparent rounded-md tl  items-center justify-center text-lg font-semibold text-white border-[1px] border-solid xl:border-0 "
+//               >
+//                 {isMenuOpen ? (
+//                   <AiOutlineClose className="text-[30px] text-[#ec5a44]" />
+//                 ) : (
+//                   <RiMenu3Fill className="text-[30px] text-[#ec5a44]" />
+//                 )}
+//               </button>
+//             </div>
+//           </div>
+
+//    <IoSearchLi openInput={openInput} />
+
+//  <div className="hidden xl:flex mt-1 mr-5">
+//             {isMenuOpenIcon ? (
+//               <IoMdClose
+//                 onClick={closeSearch}
+//                 className="text-2xl text-[#ec5a44] cursor-pointer"
+//               />
+//             ) : (
+//               <FaSearch
+//                 onClick={openSearch}
+//                 className="text-xl text-[#ec5a44] cursor-pointer"
+//               />
+//             )}
+
+//             <input
+//               ref={inputMob}
+//               onKeyUp={(e) => handleKeyUp(e)}
+//               onChange={handleChange}
+//               className={`absolute  top-[70px] -right-full  border-[1px] rounded-md  border-red-400 text-black w-[80%]  tl z-[300] px-[10px] py-[10px] outline-none`}
+//               type="text"
+//             />
+//           </div>
+
+//  <SupportUs mobileSupport={mobileSupport} />
+
+//  <ul
+//             className={`flex justify-center bg-[#fff] gap-6  w-full transition-all  xl:flex-col xl:fixed xl:top-[-100%] xl:right-0 xl:left-0 xl:px-8 md:px-2`}
+//             ref={menu}
+//           >
+//             {data?.header &&
+//               data?.header?.map((item, i) => (
+//                 <AltMenu
+//                   key={i}
+//                   refkey={opacityLi}
+//                   refkey2={alt_item}
+//                   openSubCategory={openSubCategory}
+//                   isMobile={isMobile}
+//                   openAltMenu={() => openAltMenu(item?.alt_menu)}
+//                   items={item}
+//                   openMenu={openMenu}
+//                 />
+//               ))}
+//             <li
+//               onClick={openContactMenu}
+//               className="flex gap-2 flex-col relative h-full p-[8px] cursor-pointer  uppercase bg-[#fff] text-[#ec5a44] rounded-md tl  items-start justify-center  font-semibold border-[1px] border-solid border-transparent  xl:justify-start xl:bg-transparent xl:text-[#ec5a44] xl:border-b-[1px] bg:border-solid xl:border-b-[#0000008a]  md:p-[4px] contactLi"
+//             >
+//               <div className="flex items-center">
+//                 <span className="text-lg 2xl:text-[13px]">contact</span>
+//                 <FaAngleDown />
+//               </div>
+//               <div
+//                 ref={contactliInner}
+//                 className={`absolute contactLi top-[55px] left-0 px-[20px] py-[20px] rounded-md right-0  w-[400px] h-auto text-black tl bg-[#fff]
+//             ${isMobile ? "contactliInnerMob" : "contactliInner"}`}
+//               >
+//                 <EmailAndAdress
+//                   sosicals={sosicals}
+//                   email={data?.sosials?.email}
+//                   map={data?.sosials?.map}
+//                   adress={data?.sosials?.unvan_en}
+//                 />
+//               </div>
+//             </li>
+//           </ul>
+
+// <Script>
+//         {`
+//           window.interdeal = {
+//             "sitekey": "99292099e74a878f42c7a31740bb6203",
+//             "Position": "Left",
+//             "Menulang": "EN",
+//             "domains": {
+//               "js": "https://cdn.equalweb.com/",
+//               "acc": "https://access.equalweb.com/"
+//             },
+//             "btnStyle": {
+//               "vPosition": [ "80%", null ],
+//               "scale": [ "0.8", "0.8" ],
+//               "icon": {
+//                 "type": 7,
+//                 "shape": "semicircle",
+//                 "outline": false
+//               }
+//             }
+//           };
+//           var coreCall = document.createElement('script');
+//           coreCall.src = interdeal.domains.js + 'core/4.6.1/accessibility.js';
+//           coreCall.defer = true;
+//           coreCall.integrity = 'ssha512-hGa5HZtFkT1M7+tUDtU/cbw6AG0ORz3oblztCoTZ/z2qPyr7dgwH3zoT8qpgj21MgcRsMFLD6NNKePGvVks3Ig==';
+//           coreCall.crossOrigin = 'anonymous';
+//           coreCall.setAttribute('data-cfasync', true );
+//           document.body.appendChild(coreCall);
+//         `}
+//       </Script>
+
+
+export async function generateMetadata({ params }) {
+  try {
+    const data = await fetchData(
+      `current-isuses/${params?.id}/${params?.slug}`
+    );
+    const baseUrl = `${process.env.NEXT_PUBLIC_LINK}current-issues/${params?.id}/${params?.slug}`;
+    const pictureBaseUrl = process.env.NEXT_PUBLIC_STORAGE;
+    const logoUrl = `${pictureBaseUrl}/${data?.currentIsuses}`;
+    const faviconUrl = `${data?.favicon}`;
+    const generatedKeywords = generateKeywordsFromWords(data?.data?.text_en);
+
+    return {
+      title: `${process.env.NEXT_DOAMIN_REAL} - Current issues - ${data?.data?.name_en}`,
+      description: stripHTML(data?.data?.title_en),
+      keywords: generatedKeywords,
+      author: "Cavidan Ismayilov",
+      icons: {
+        icon: faviconUrl,
+        apple: faviconUrl,
+      },
+      openGraph: {
+        title: `${process.env.NEXT_DOAMIN_REAL} - Current issues - ${data?.data?.name_en}`,
+        description: stripHTML(data?.data?.title_en),
+        keywords: generatedKeywords,
+        author: "Cavidan Ismayilov",
+        url: baseUrl,
+        siteName: `${process.env.NEXT_PUBLIC_LINK}`,
+        type: "website",
+        image: logoUrl,
+        images: [
+          {
+            url: logoUrl,
+            secure_url: logoUrl,
+            width: 300,
+            height: 300,
+            type: "image/webp",
+            alt: data?.data?.title_en,
+          },
+        ],
+      },
+    };
+  } catch (error) {
+    if (error instanceof Error) {
+      return new Response(error.message, { status: 500 });
+    }
+    return new Response("Internal Server Error", { status: 500 });
+  }
+}
