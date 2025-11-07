@@ -1,74 +1,38 @@
-import {
-  generateKeywordsFromWords,
-  stripHTML,
-} from "@/app/(components)/seo/seo";
 import TakeActionItem from "@/app/(components)/TakeAction/TakeActionItem";
-import Footer from "@/app/(layout)/Footer/Footer";
-import Header from "@/app/(layout)/Header/Header";
-import { fetchData } from "@/app/fetch/fetchData";
-
-const getData = async (params) => {
-  const current = await fetchData(`nac_take/${params?.id}/${params?.slug}`);
-  const header = await fetchData("header");
-  const nac_footer = await fetchData("nac_footer");
-  const settingsData = await fetchData("settings");
-  return { current, header, nac_footer, settingsData };
-};
 
 export async function generateMetadata({ params }) {
-  try {
-    const { settingsData, current } = await getData(params);
-    const baseUrl = `${process.env.NEXT_DOAMIN_REAL}`;
-    const logoUrl = `${current?.take?.cover}`;
-    const faviconUrl = `${settingsData?.settings?.favicon}`;
-    const generatedKeywords = generateKeywordsFromWords(
-      current?.take?.intro_text_en
-    );
-    const desc = stripHTML(current?.take?.intro_text_en);
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API}/take-action/${params?.id}/${params?.slug}`
+  );
+  const data = await response.json();
 
-    return {
-      title: `${settingsData?.settings?.title} - ${current?.take?.title_en}`,
-      description: desc,
-      keywords: generatedKeywords,
-      icons: {
-        icon: faviconUrl,
-        apple: faviconUrl,
-      },
-      openGraph: {
-        title: `${settingsData?.settings?.title} - ${current?.take?.title_en}`,
-        description: desc,
-        keywords: generatedKeywords,
-        url: `https://azcanet.ca/take-action/${params?.id}/${params?.slug}`,
-        siteName: `${process.env.NEXT_DOAMIN_REAL}`,
-        type: "website",
-        image: logoUrl,
-        images: [
-          {
-            url: logoUrl,
-            secure_url: logoUrl,
-            width: 300,
-            height: 300,
-            type: "image/webp",
-            alt: current?.take?.title_en,
-          },
-        ],
-      },
-    };
-  } catch (error) {
-    if (error instanceof Error) {
-      return new Response(error.message, { status: 500 });
-    }
-    return new Response("Internal Server Error", { status: 500 });
-  }
+  const removeHtmlTags = (str) => {
+    if (!str) return "";
+    return str.replace(/<[^>]*>/g, "");
+  };
+  
+  const cleanedDescription2 = removeHtmlTags(data?.take?.intro_text_en);
+
+  return {
+    title: `Take Action - ${data?.take?.title_en}`,
+    description: cleanedDescription2,
+    openGraph: {
+      title: `Take Action - ${data?.take?.title_en}`,
+      description: cleanedDescription2,
+      url: `https://azcanet.ca/take-action/${params?.id}/${params?.slug}`,
+      siteName: "azcanet.ca",
+      images: [
+        {
+          url: `${data?.take_action?.take_action_banner_src}`,
+          secure_url: `${data?.take_action?.take_action_banner_src}`,
+          width: 600,
+          height: 600,
+        },
+      ],
+    },
+  };
 }
 
 export default async function page({ params }) {
-  const { current, header, nac_footer, settingsData } = await getData(params);
-  return (
-    <>
-      <Header data={header} footer={nac_footer} settings={settingsData} />
-      <TakeActionItem params={params} data={current} />
-      <Footer footer={nac_footer} />
-    </>
-  );
+  return <TakeActionItem params={params} />;
 }

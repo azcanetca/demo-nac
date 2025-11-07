@@ -1,5 +1,7 @@
 "use client";
 
+import Loading from "@/app/loading";
+
 import Breadcrumb from "../Breadcrumb/Breadcrumb";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination, Autoplay } from "swiper/modules";

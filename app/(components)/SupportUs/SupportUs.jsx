@@ -1,99 +1,118 @@
+"use client";
+
+import Loading from "@/app/loading";
+import { useEffect, useState } from "react";
+import Breadcrumb from "../Breadcrumb/Breadcrumb";
 import Link from "next/link";
-import SharedBanner from "../GlobalBanner/SharedBanner";
-// --- DÜZELTİLMİŞ IMPORTLAR ---
-import { FaCreditCard, FaRegEnvelope } from "react-icons/fa";
-import { FiMail } from "react-icons/fi"; // FiMail doğru yerden import edildi
+import Transition from "../Transition/Transition";
 
-// Her bir kart için yeniden kullanılabilir bir component oluşturmak daha temiz bir yaklaşımdır.
-const SupportCard = ({ icon, title, text, href, isExternal = false }) => {
-  const IconComponent = icon;
+const SupportUs = () => {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_API}/support-us`)
+      .then((res) => res.json())
+      .then((data) => setData(data))
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
 
-  return (
-    <Link
-      href={href}
-      target={isExternal ? "_blank" : "_self"}
-      rel={isExternal ? "noopener noreferrer" : ""}
-      className="group block col-span-4 lg:col-span-6 md:col-span-12"
-    >
-      <div className="bg-white rounded-xl shadow-lg p-8 text-center h-full transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-2">
-        <div className="flex justify-center mb-6">
-          <div className="bg-blue-100 rounded-full p-4">
-            <IconComponent className="h-8 w-8 text-blue-600" />
-          </div>
-        </div>
-        <h3 className="text-xl font-bold text-gray-900 mb-3 uppercase">
-          {title}
-        </h3>
-        <p className="text-gray-600 leading-relaxed">{text}</p>
-      </div>
-    </Link>
-  );
-};
-
-const SupportUs = ({ data }) => {
   const pageNames = [
-    { name: "Home page", link: "/" },
-    { name: "Support Us", link: "#" },
+    {
+      name: "Home page",
+      link: "/",
+    },
+    {
+      name: "Support Us",
+      link: "#",
+    },
   ];
 
+  const cards = [
+    {
+      id: 1,
+      link: `${data?.support_card_1_link}`,
+      title: `${data?.support_credit_card}`,
+      text: `${data?.support_card_1_text}`,
+    },
+    {
+      id: 2,
+      link: "#",
+      title: `${data?.support_e_transfer}`,
+      text: `${data?.support_card_2_text}`,
+    },
+    {
+      id: 3,
+      link: "#",
+      title: `${data?.support_e_cheque}`,
+      text: `${data?.support_card_3_text}`,
+    },
+  ];
+
+  if (loading && !data) return <Loading />;
   return (
     <>
-      <div className="pt-[68px] md:pt-[63px]">
-        <SharedBanner
-          images={data?.search_banner_src}
-          pageNames={pageNames}
-          title_en={data?.support_top_title}
-          imgClass={`h-[380px] md:h-[280px]`}
-          justify="justify-start lg:items-start "
-        />
-      </div>
-      <div className="bg-slate-50 py-16 lg:py-8">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mx-auto text-center space-y-4 mb-16">
-            <div
-              className="text-[20px] md:text-[14px] text-gray-700 max-w-none"
-              dangerouslySetInnerHTML={{
-                __html: `${data?.support_top_title_2}`,
-              }}
-            />
-            <div
-              className="text-[20px] md:text-[14px] text-gray-600 max-w-none"
-              dangerouslySetInnerHTML={{
-                __html: `${data?.support_top_title_3}`,
-              }}
-            />
-          </div>
-          <div className="grid grid-cols-12 gap-8">
-            <SupportCard
-              icon={FaCreditCard}
-              title={data?.support_credit_card}
-              text={data?.support_card_1_text}
-              href={data?.support_card_1_link || "#"}
-              isExternal={true}
-            />
-            <SupportCard
-              icon={FiMail}
-              title={data?.support_e_transfer}
-              text={data?.support_card_2_text}
-              href="#"
-            />
-            <SupportCard
-              icon={FaRegEnvelope}
-              title={data?.support_e_cheque}
-              text={data?.support_card_3_text}
-              href="#"
-            />
-          </div>
-          <div className="max-w-4xl mx-auto text-center mt-16">
-            <div
-              className="prose text-sm text-gray-500 max-w-none"
-              dangerouslySetInnerHTML={{
-                __html: `${data?.support_bottom_text}`,
-              }}
-            />
-          </div>
+      <Transition>
+        <div className="mt-16">
+          <Breadcrumb pageNames={pageNames} />
         </div>
-      </div>
+        <div className="mt-5 lg:mt-0 py-[30px] px-[150px] 2xl:px-[50px] lg:px-[20px] text-center">
+          <p
+            className="uppercase text-2xl lg:text-lg font-bold mb-3 mt-6 "
+            dangerouslySetInnerHTML={{
+              __html: data?.support_top_title,
+            }}
+          ></p>
+          <p
+            className="text-lg lg:text-sm px-5 py-0 m-0 md:px-1"
+            dangerouslySetInnerHTML={{
+              __html: data?.support_top_title_2,
+            }}
+          ></p>
+          <p
+            className="text-lg lg:text-sm px-5 py-0 mt-5"
+            dangerouslySetInnerHTML={{
+              __html: data?.support_top_title_3,
+            }}
+          ></p>
+          <div className="grid grid-cols-12 gap-6 mt-10 mb-20 lg:mb-4">
+            {cards &&
+              cards?.map((elem, i) => {
+                return (
+                  <div
+                    key={i}
+                    className="col-span-4 xl:col-span-6 lg:col-span-12 tl hover:scale-105"
+                  >
+                    <div className="flex items-center justify-center flex-col  h-full">
+                      <Link
+                        href={elem?.link}
+                        className="inline-block w-full h-full "
+                      >
+                        <div className="h-full border-[1px] border-solid border-[#ec5a44] rounded-md">
+                          <div className="bg-[#ec5a44] px-[15px] py-[10px]">
+                            <h3 className="text-white uppercase font-semibold">
+                              {elem?.title}
+                            </h3>
+                          </div>
+                          <div className="mt-3 px-[10px] py-[20px]">
+                            <h6 className="uppercase text-sm">{elem?.text}</h6>
+                          </div>
+                        </div>
+                      </Link>
+                    </div>
+                  </div>
+                );
+              })}
+          </div>
+          <div
+            className="contentstatments "
+            dangerouslySetInnerHTML={{
+              __html: data?.support_bottom_text,
+            }}
+          ></div>
+        </div>
+      </Transition>
     </>
   );
 };

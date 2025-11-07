@@ -8,12 +8,12 @@ const SupportUs = ({ mobileSupport }) => {
         style={{
           background: mobileSupport,
         }}
-        className={` flex gap-2 h-full    px-[6px] py-[4px] cursor-pointer   uppercase rounded-md tl  items-center justify-center text-lg font-semibold text-white border-[1px] border-solid border-transparent xl:items-start xl:justify-start   2xl:text-[13px] md:p-[4px]`}
+        className={` flex gap-2 h-full  p-[8px] cursor-pointer   uppercase rounded-md tl  items-center justify-center text-lg font-semibold text-white border-[1px] border-solid border-transparent xl:items-start xl:justify-start xl:bg-transparent xl:text-[#ec5a44] 2xl:text-[13px] md:p-[4px]`}
       >
         <Link
           href="/supportus"
           target="_blank"
-          className="text-black xl:text-[#ec5a44] flex  w-max"
+          className="text-white xl:text-[#ec5a44]"
         >
           support us
         </Link>

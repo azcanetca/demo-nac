@@ -1,59 +1,105 @@
+"use client";
+
 import Image from "next/image";
+import React, { useEffect, useRef, useState } from "react";
+
+import { FaAngleDown } from "react-icons/fa";
 import Link from "next/link";
 
-const Press = ({ press }) => {
-  if (!press || (Array.isArray(press) && press.length === 0)) {
-    return null;
-  }
+import Spinner from "../../Spinner/Spinner";
+import TwitterTimeLine from "../../TwitterTimeLine/TwitterTimeLine";
 
-  const { title_1_en, text_en, src, title_view_all, link } = press;
+const Press = () => {
+  const [data, setData] = useState([]);
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_API}/press`)
+      .then((res) => res.json())
+      .then((data) => setData(data));
+  }, []);
+
+  const twitter = useRef();
+  const targetSlug = "press-centre";
+  const press_menu = useRef();
+  const pressCentreItem = data?.header?.find(
+    (item) => item?.slug_en === targetSlug
+  );
+  const altMenuItems = pressCentreItem ? pressCentreItem?.alt_menu : [];
+
+  useEffect(() => {
+    setTimeout(() => {
+      twitter?.current?.classList?.add("hidden");
+    }, 2500);
+  }, []);
+
+  const openPressMenu = () => {
+    press_menu?.current?.classList?.toggle("hidden");
+  };
 
   return (
-    <section className="bg-white py-20 md:py-12 relative overflow-hidden">
-      <div
-        className="absolute top-[-10rem] right-[-15rem] w-[50rem] h-[50rem] bg-red-100 rounded-full opacity-60 filter blur-3xl -z-0"
-        aria-hidden="true"
-      ></div>
-      <div
-        className="absolute bottom-[-15rem] left-[-10rem] w-[45rem] h-[45rem] bg-amber-100 rounded-full opacity-50 filter blur-3xl -z-0"
-        aria-hidden="true"
-      ></div>
-
-      <div className="container mx-auto px-6 relative z-10">
-        <div className="relative grid grid-cols-12 gap-6 items-center">
-          <div className="col-span-6 lg:col-span-12 bg-slate-50 rounded-2xl p-12 lg:p-6 relative z-10 ">
-            <h1 className="text-4xl xl:text-2xl font-extrabold text-gray-900 tracking-tight">
-              {title_1_en}
-            </h1>
-            <div
-              className="mt-6 prose prose-lg max-w-none text-gray-600"
-              dangerouslySetInnerHTML={{ __html: `${text_en}` }}
-            />
-            <div className="mt-12">
-              <Link href={`/${link}`} legacyBehavior>
-                <a className="font-semibold text-lg text-gray-900 group">
-                  <span>{title_view_all}</span>
-                  <span className="block max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 bg-[#ec5a44] mt-1"></span>
-                </a>
-              </Link>
-            </div>
-          </div>
-
-          <div className="col-span-6 lg:col-span-12 relative z-20 order-first mb-8 lg:mb-0">
-            <div className="aspect-w-4 aspect-h-5 rounded-2xl overflow-hidden shadow-2xl">
-              <Image
-                src={src}
-                width={1000}
-                height={600}
-                objectFit="cover"
-                alt="Press Centre - Baku"
-                className="transform lg:h-[400px] object-cover hover:scale-105 transition-transform duration-700 ease-out"
-              />
+    <>
+      {" "}
+      <div className="grid grid-cols-12 gap-5 px-[50px] py-[50px] lg:py-[20px] lg:px-[20px]">
+        <div className="col-span-9  relative lg:col-span-12">
+          <Image
+            src={data?.press?.src}
+            width={1000}
+            height={400}
+            alt="press banner"
+            className="!w-full h-[650px] object-cover lg:h-[400px]"
+          />
+          <div className="absolute w-[50%] lg:w-full bottom-[50px] lg:left-2 left-[50px] text-white">
+            <h2 className="font-bold text-[22px] ">
+              {data?.press?.title_1_en}
+            </h2>
+            <p
+              className="font-[400] text-[15px]  py-[1rem]"
+              dangerouslySetInnerHTML={{
+                __html: data && data?.press?.text_en,
+              }}
+            ></p>
+            <div className="relative ">
+              <div
+                onClick={openPressMenu}
+                className="flex items-center gap-3 bg-[#ec5a44] w-fit px-2 py-3 cursor-pointer rounded-lg"
+              >
+                <h1 className=" text-[16px] uppercase  font-semibold">
+                  Our Statements
+                </h1>
+                <FaAngleDown />
+              </div>
+              <ul
+                ref={press_menu}
+                className="absolute bottom-[50px] left-0 right-0 bg-white w-fit hidden transition-all "
+              >
+                {altMenuItems &&
+                  altMenuItems?.map((item, i) => (
+                    <li
+                      className="text-black cursor-pointer hover:bg-[#ec5a44] w-full  h-full flex  transition-all hover:text-white"
+                      key={i}
+                    >
+                      <Link
+                        className="w-full h-full px-2 py-2"
+                        href={item?.slug_en ? item?.slug_en : ""}
+                      >
+                        {item?.menu_en}
+                      </Link>
+                    </li>
+                  ))}
+              </ul>
             </div>
           </div>
         </div>
+        <div className="col-span-3 lg:col-span-12  relative h-[650px]  overflow-hidden border-[1px] rounded-[12px]">
+          <div
+            ref={twitter}
+            className="absolute top-[50%] left-[50%] text-[20px] text-black font-bold translate-x-[-50%] translate-y-[-50%] bg-[#fff] z-[30] w-full h-full flex items-center justify-center"
+          >
+            <Spinner count={10} />
+          </div>
+          <TwitterTimeLine />
+        </div>
       </div>
-    </section>
+    </>
   );
 };
 

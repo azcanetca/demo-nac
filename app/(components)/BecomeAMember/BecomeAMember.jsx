@@ -1,47 +1,78 @@
-import Link from "next/link";
-import SharedBanner from "../GlobalBanner/SharedBanner";
+"use client";
 
-const BecomeAMember = ({ data }) => {
+import Loading from "@/app/loading";
+import { useEffect, useState } from "react";
+import Breadcrumb from "../Breadcrumb/Breadcrumb";
+import GlobalBanner from "../GlobalBanner/GlobalBanner";
+import AccordionItem from "./AccordionItem";
+import Transition from "../Transition/Transition";
+import { FaArrowRight } from "react-icons/fa6";
+import Link from "next/link";
+
+const BecomeAMember = () => {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_API}/become-a-member`)
+      .then((res) => res.json())
+      .then((data) => setData(data))
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
+
   const pageNames = [
     {
       name: "Home page",
       link: "/",
     },
     {
-      name: "Become a member",
+      name: "become a member",
       link: "#",
     },
   ];
 
+  if (loading || !data) return <Loading />;
+
   return (
     <>
-      <div className="pt-[68px] md:pt-[63px] bg-gray-50">
-        <SharedBanner
-          images={data?.become_a_member_banner_src}
-          pageNames={pageNames}
-          title_en={data?.become_a_member_banner_title_en}
-          imgClass={`h-[380px] md:h-[280px]`}
-          justify="justify-start lg:items-start "
-        />
-      </div>
-
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 ">
+      <Transition>
+        <div className="mb-4 mt-16">
+          <Breadcrumb pageNames={pageNames} />
+          <GlobalBanner
+            longtext={data?.become_a_member_banner_title_en}
+            bgColor={data?.section_bg}
+            images={data?.become_a_member_banner_src}
+          />
+        </div>
         <div
-          className=" tab-content media md:text-sm pt-[30px]"
+          className="py-[30px] px-[100px] 2xl:px-[50px] lg:px-[20px] tab-content media lg:text-sm"
           dangerouslySetInnerHTML={{
-            __html: `${data?.become_member_text_en}`,
+            __html: data?.become_member_text_en,
           }}
         />
-        <div className="mb-[40px]">
+        {data?.faq?.length > 0 && (
+          <div
+            className={`${
+              data?.faq?.length > 0
+                ? "py-[30px] px-[100px] 2xl:px-[50px] lg:px-[20px] md:px-[10px]"
+                : " "
+            }`}
+          >
+            <AccordionItem accordionItems={data?.faq} />
+          </div>
+        )}
+        <div className="py-[0px] px-[100px] 2xl:px-[50px] lg:px-[20px] md:px-[10px]">
           <Link
             href={data?.google_form}
             target="_blank"
-            className="bg-[#ec5a44] rounded-[6px] px-[30px] py-[10px] text-[15px] text-white"
+            className=" px-[16px] py-[10px] w-fit bg-[#ec5a44] hover-effect uppercase hover:bg-white hover:text-[#ec5a44] border border-[#ec5a44] text-white rounded-[4px] font-[400] flex items-center hover:gap-[20px] gap-[10px]"
           >
             {data?.google_form_name}
+            <FaArrowRight />
           </Link>
         </div>
-      </div>
+      </Transition>
     </>
   );
 };

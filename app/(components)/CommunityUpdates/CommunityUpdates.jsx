@@ -1,5 +1,6 @@
 "use client";
 
+import Loading from "@/app/loading";
 import { useEffect, useState } from "react";
 import Breadcrumb from "../Breadcrumb/Breadcrumb";
 import CommonData from "../Statements/CommonData";
@@ -51,6 +52,7 @@ const CommunityUpdates = () => {
     setPage((prevPage) => prevPage + 1);
   };
 
+  if (loading || !data) return <Loading />;
   return (
     <>
       <Transition>

@@ -34,15 +34,15 @@ const GlobalBanner = ({ longtext, bgColor, longtext2, images }) => {
         </div>
         <div className="col-span-12 ">
           <div className="flex items-center justify-center lg:justify-center h-full text-center  flex-col">
-            <div
+            <p
               className="font-[700] text-4xl capitalize 2xl:text-2xl lg:text-lg"
-              dangerouslySetInnerHTML={{ __html: `${longtext}` }}
-            />
+              dangerouslySetInnerHTML={{ __html: longtext && longtext }}
+            ></p>
             {longtext2 !== "" && (
-              <div
+              <p
                 className="font-[400] mt-3 text-md capitalize 2xl:text-2xl lg:text-lg"
-                dangerouslySetInnerHTML={{ __html: `${longtext2}` }}
-              />
+                dangerouslySetInnerHTML={{ __html: longtext2 && longtext2 }}
+              ></p>
             )}
           </div>
         </div>

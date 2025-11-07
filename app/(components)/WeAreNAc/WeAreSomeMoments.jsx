@@ -1,67 +1,86 @@
-"use client";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay, Pagination } from "swiper/modules";
+import "swiper/css";
+
 import React from "react";
 import LightGallery from "lightgallery/react";
 import "lightgallery/css/lightgallery.css";
+import "swiper/css/pagination";
 import Image from "next/image";
 
-const MarqueeMoments = ({ data, text1 }) => {
-  const extendedGalleryImages = React.useMemo(() => {
-    if (!data || data.length === 0) {
-      return [];
-    }
-
-    return Array.from({ length: 5 }).flatMap(() => data);
-  }, [data]);
-
+const WeAreSomeMoments = ({ data }) => {
   return (
-    <div className="bg-[#7d63a720] py-20 xl:py-10 md:mt-[2rem] mt-[5rem] overflow-hidden rotate-[-2deg]">
-      <div className="container mx-auto px-4  pb-8 md:px-8 rotate-[2deg]">
-        <div className="text-center ">
-          <h2 className="text-4xl xl:text-3xl md:text-xl font-bold bg-clip-text text-[#d43300]">
-            {text1}
-          </h2>
+    <>
+      <div className="px-[50px] py-[20px] mb-10 mt-20 lg:py-[20px] lg:px-[20px] some_moments ">
+        <div className="flex items-center justify-center mb-10 w-full text-black font-bold  ">
+          <h1 className="text-center text-5xl 2xl:text-2xl lg:text-xl">
+            Some moments of N.A.C.
+          </h1>
+        </div>
+        <div>
+          <Swiper
+            slidesPerView={1}
+            spaceBetween={10}
+            autoplay={{
+              delay: 2500,
+              disableOnInteraction: false,
+            }}
+            pagination={{
+              clickable: true,
+            }}
+            breakpoints={{
+              "@0.00": {
+                slidesPerView: 1,
+                spaceBetween: 10,
+              },
+              "@0.75": {
+                slidesPerView: 2,
+                spaceBetween: 20,
+              },
+              "@1.00": {
+                slidesPerView: 5,
+                spaceBetween: 40,
+              },
+              "@1.50": {
+                slidesPerView: 8,
+                spaceBetween: 50,
+              },
+            }}
+            modules={[Autoplay, Pagination]}
+            className="h-[250px] lg:h-[300px]"
+          >
+            {data &&
+              data?.map((item, i) => {
+                return (
+                  <SwiperSlide key={i}>
+                    <div className="swiper_hover">
+                      <div className="relative overflow-hidden">
+                        <div className="w-full">
+                          <LightGallery elementClassNames="custom-wrapper-class">
+                            <a href={item?.src ? item?.src : ""}>
+                              <Image
+                                src={item?.src ? item?.src : ""}
+                                alt=""
+                                width={1000}
+                                height={500}
+                                className="w-full object-cover h-[200px]  rounded-[10px]"
+                              />
+                            </a>
+                          </LightGallery>
+                        </div>
+                      </div>
+                      <p className="font-bold text-[16px] mt-2 text-[#212529] line-clamp-2 transition-all ease-linear">
+                        {item?.title_en}
+                      </p>
+                    </div>
+                  </SwiperSlide>
+                );
+              })}
+          </Swiper>
         </div>
       </div>
-
-      <div className="relative flex flex-col gap-8 group rotate-[2deg]">
-        <div className="absolute inset-0 flex items-center opacity-20 blur-sm">
-          <div className="flex w-max animate-marquee-reverse group-hover:[animation-play-state:paused]">
-            {extendedGalleryImages?.map((item, i) => (
-              <div key={`bg-${i}`} className="flex-shrink-0 px-4">
-                <div className="w-64 h-40 bg-slate-700 rounded-xl"></div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <LightGallery
-          elementClassNames="flex w-max rotate-[2deg] animate-marquee group-hover:[animation-play-state:paused]"
-          speed={1500}
-        >
-          {extendedGalleryImages?.map((item, i) => (
-            <a
-              href={item?.src}
-              key={`fg-${i}`}
-              className="flex-shrink-0 px-4 block"
-              aria-label={item?.title_en}
-            >
-              <Image
-                src={item?.src}
-                alt={item?.title_en}
-                width={500}
-                height={700}
-                className="
-                  w-auto h-64 max-md:h-48 object-cover rounded-2xl shadow-lg 
-                  transition-all duration-300 ease-in-out
-                  hover:scale-105 hover:shadow-cyan-400/20 hover:shadow-2xl
-                "
-              />
-            </a>
-          ))}
-        </LightGallery>
-      </div>
-    </div>
+    </>
   );
 };
 
-export default MarqueeMoments;
+export default WeAreSomeMoments;

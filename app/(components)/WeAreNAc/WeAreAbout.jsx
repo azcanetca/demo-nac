@@ -1,57 +1,41 @@
 import Image from "next/image";
 import React from "react";
 
-const WeAreAbout = ({
-  title,
-  title2 = null,
-  text,
-  text2 = null,
-  url,
-  bg,
-  order = "",
-  our_story,
-}) => {
-  const accentColor = "#7d63a7";
+const WeAreAbout = ({ title, title2 = null, text, text2 = null, url, bg }) => {
   return (
     <>
-      <div className="bg-slate-50 py-20 xl:py-10 md:py-4 2xl:px-[30px] md:px-[15px]">
-        <div className="container mx-auto px-4 lg:px-8 md:px-0">
-          <div className="grid grid-cols-12 items-center gap-16 lg:gap-0">
-            <div className="relative p-8 col-span-6 lg:col-span-12  sm:p-4 lg:mb-[20px]">
-              <div
-                className="absolute top-0 left-0 h-full w-full rounded-2xl transform -rotate-3 transition-transform duration-300 group-hover:rotate-0"
-                style={{ backgroundColor: `${accentColor}20` }}
-              ></div>
-
-              <div className="relative rounded-2xl overflow-hidden shadow-xl">
-                <Image
-                  src={url}
-                  width={1000}
-                  height={800}
-                  alt={title || "Our Story Image"}
-                  className="w-full h-auto object-cover"
-                />
-              </div>
-            </div>
-
-            <div
-              className={`flex flex-col col-span-6 lg:col-span-12 md:mt-[20px] md:px-[10px] justify-center ${order}`}
-            >
-              <h3
-                className="font-semibold uppercase tracking-wider mb-3"
-                style={{ color: accentColor }}
-              >
-                {our_story}
-              </h3>
-              <h2 className="text-4xl xl:text-2xl md:text-xl font-bold text-gray-800 leading-tight ">
-                {title}
-              </h2>
-              <div
-                className="mt-6 md:mt-2 text-lg xl:text-[14px] md:text-[12px] text-gray-600 leading-relaxed prose max-w-none"
-                dangerouslySetInnerHTML={{ __html: `${text}` }}
-              ></div>
-            </div>
-          </div>
+      <div
+        style={{ backgroundImage: `url(${bg})` }}
+        className="px-[183px]  xl:px-[40px] md:p-[50px] sm:py-[50px] sm:px-[18px] py-[60px] bg-cover bg-full text-white flex lg:flex-col items-center gap-[24px]"
+      >
+        <div className="w-[50%] lg:w-full">
+          {title2 !== null && (
+            <h3 className="text-[34px] lg:text-[22px] font-[700] ps-[18px] relative before:content-[''] before:w-[8px] before:h-full before:left-0 before:absolute before:bg-white">
+              {title2}
+            </h3>
+          )}
+          {text2 !== null && (
+            <p
+              className="pt-[20px] mb-[10px] text-justify text-[16px] lg:text-[13px] font-[400]"
+              dangerouslySetInnerHTML={{ __html: text2 }}
+            ></p>
+          )}
+          <h3 className="text-[34px] lg:text-[22px] font-[700] pt-4 lg:pt-0 ps-[18px] relative before:content-[''] before:w-[8px] before:h-full before:left-0 before:absolute before:bg-white">
+            {title}
+          </h3>
+          <p
+            className="pt-[20px] text-justify text-[16px] font-[400] lg:text-[13px]"
+            dangerouslySetInnerHTML={{ __html: text }}
+          ></p>
+        </div>
+        <div className="w-[50%] lg:w-full">
+          <Image
+            src={url ? url : ""}
+            width={1000}
+            height={500}
+            alt={`Picture of the ${title}`}
+            className="w-full h-auto object-cover object-center rounded-[4px] overflow-hidden"
+          />
         </div>
       </div>
     </>

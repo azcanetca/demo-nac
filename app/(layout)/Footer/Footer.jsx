@@ -3,166 +3,232 @@
 import BackToTop from "@/app/(components)/GoToTop/GoToTop";
 import Image from "next/image";
 import Link from "next/link";
-
+import React, { useEffect, useState } from "react";
 import {
-  FaFacebookF,
-  FaInstagram,
+  FaFacebook,
+  FaInstagramSquare,
   FaTwitter,
   FaYoutube,
-  FaLinkedinIn,
+  FaLinkedin,
 } from "react-icons/fa";
 
-const Footer = ({ footer }) => {
-  // Veri yapılarını daha temiz ve yönetilebilir hale getirelim.
-  const year = new Date().getFullYear();
+const Footer = () => {
+  const [data, setData] = useState([]);
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_API}/footer`)
+      .then((res) => res.json())
+      .then((data) => setData(data));
+  }, []);
 
-  const menuLinks = {
-    "We Are Nac": [
-      { text: "Current issues", href: "/current-issues" },
-      { text: "Take action", href: "/take-action" },
-      { text: "Find your representative", href: "/find-your-representative" },
-    ],
-    Resources: [
-      { text: "Statements", href: "/statements" },
-      { text: "Media", href: "/media" },
-      { text: "Community updates", href: "/community-updates" },
-    ],
+  const getAltMenuItems = (slug) => {
+    const item = data?.header?.find((item) => item?.slug_en === slug);
+    return item ? item?.alt_menu : [];
   };
 
-  const socialLinks = [
+  const advocacy = "our-advocacy";
+  const press = "press-centre";
+
+  const altMenuadvocacyItems = getAltMenuItems(advocacy, data);
+  const altMenupressItems = getAltMenuItems(press, data);
+
+  const contact = [
     {
-      icon: <FaFacebookF />,
-      href: footer?.sosials?.facebook,
-      name: "Facebook",
+      id: 1,
+      name: "contact",
     },
     {
-      icon: <FaInstagram />,
-      href: footer?.sosials?.instagram,
-      name: "Instagram",
+      id: 2,
+      name: "Email",
+      mail: `${data?.sosials?.email}`,
     },
-    { icon: <FaTwitter />, href: footer?.sosials?.twitter, name: "Twitter" },
-    { icon: <FaYoutube />, href: footer?.sosials?.youtube, name: "YouTube" },
     {
-      icon: <FaLinkedinIn />,
-      href: footer?.sosials?.linkedin,
-      name: "LinkedIn",
+      id: 3,
+      name: "Address",
+      adres: `${data?.sosials?.unvan_en}`,
+      link: `${data?.sosials?.map}`,
+    },
+    {
+      id: 4,
+      sosicals: [
+        {
+          id: 1,
+          icon: <FaFacebook />,
+          link: `${data?.sosials?.facebook}`,
+        },
+        {
+          id: 2,
+          icon: <FaInstagramSquare />,
+          link: `${data?.sosials?.instagram}`,
+        },
+        {
+          id: 3,
+          icon: <FaTwitter />,
+          link: `${data?.sosials?.twitter}`,
+        },
+        {
+          id: 4,
+          icon: <FaYoutube />,
+          link: `${data?.sosials?.youtube}`,
+        },
+        {
+          id: 5,
+          icon: <FaLinkedin />,
+          link: `${data?.sosials?.linkedin}`,
+        },
+      ],
     },
   ];
+  const year = new Date().getFullYear();
 
   return (
-    // 1. Ana footer container'ı. Koyu tema ve göreceli konumlandırma.
-    <footer className="bg-slate-900 text-slate-300 relative">
-      {/* 2. Arka plan deseni, çok soluk bir doku olarak eklendi. */}
-      <div
-        className="absolute inset-0 bg-no-repeat bg-cover bg-center opacity-5"
-        style={{ backgroundImage: `url(${footer?.footer_bg})` }}
-        aria-hidden="true"
-      ></div>
-
-      <BackToTop />
-
-      {/* 3. Ana içerik, arka planın üzerinde (relative z-10) */}
-      <div className="container mx-auto lg:max-w-full px-6 lg:px-4 py-16 lg:py-8 relative z-10">
-        {/* Üst Kısım: Logo ve Sosyal Medya */}
-        <div className="flex flex-col  justify-between items-center gap-8 pb-10">
-          <Link href="/" className="inline-block">
-            <Image
-              src={footer?.headerlogo_white || "/notfound.webp"}
-              width={200}
-              height={50}
-              alt="Network of Azerbaijani Canadians"
-              className="h-auto lg:max-w-[120px]"
-            />
-          </Link>
-          <div className="flex items-center gap-4">
-            {socialLinks.map((social, i) => (
-              <a
-                key={i}
-                href={social.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={social.name}
-                className="text-slate-400 hover:text-[#ec5a44] transition-colors duration-300 text-xl"
-              >
-                {social.icon}
-              </a>
-            ))}
+    <>
+      <footer
+        className={`relative bg-center mt-8  before:content-[''] before:top-0 before:left-0 before:absolute before:w-full before:h-full before:-z-[1] before:bg-[#ec5a44]
+       bg-no-repeat bg-cover`}
+        style={{ backgroundImage: `url(${data?.footer_bg})` }}
+      >
+        <BackToTop />
+        <div className="grid grid-cols-12 gap-5 xl:gap-2 px-[100px] xl:px-[50px] py-[30px] md:px-[20px]">
+          <div className="col-span-3 lg:col-span-6 md:col-span-12 md:mb-2">
+            <Link href="/" className="inline-block">
+              <Image
+                src={
+                  data?.headerlogo_white
+                    ? data?.headerlogo_white
+                    : "/notfound.webp"
+                }
+                className="w-[200px] xl:w-[150px]"
+                width={1000}
+                height={100}
+                alt="azcanet.ca"
+              />
+            </Link>
           </div>
-        </div>
-
-        {/* Orta Kısım: Link Sütunları */}
-        <div className="grid grid-cols-12 w-full place-items-center place  gap-8 border-t border-slate-800 pt-10">
-          {/* Sütunları dinamik olarak oluşturma */}
-          {Object.entries(menuLinks).map(([title, links]) => (
-            <div
-              key={title}
-              className="col-span-4 xl:col-span-6 md:col-span-12"
+          <div className="col-span-3  lg:col-span-6 lg:mb-3 md:mb-0 md:col-span-12">
+            <Link
+              className="text-[25px] xl:text-[20px] md:text-[16px] text-white capitalize mb-2 md:mb-0 inline-block"
+              href="/we-are-nac"
             >
-              <h3 className="text-sm font-semibold text-white uppercase tracking-wider">
-                {title}
-              </h3>
-              <ul className="mt-4 space-y-3  w-full">
-                {links.map((link, i) => (
-                  <li key={i} className="">
-                    <Link href={link.href} legacyBehavior>
-                      <a className="hover:text-[#ec5a44] transition-colors duration-300">
-                        {link.text}
+              we are nac
+            </Link>
+            <ul className="flex flex-col gap-4 md:gap-1">
+              {altMenuadvocacyItems &&
+                altMenuadvocacyItems?.map((item, i) => {
+                  let hostName = "";
+                  if (item?.slug_en?.startsWith("https")) {
+                    let url = new URL(item?.slug_en);
+                    hostName = url.host;
+                  } else {
+                    hostName = window.location.host;
+                  }
+                  return (
+                    <li key={i}>
+                      <Link
+                        className="text-white py-[10px] md:py-[4px] text-[18px] md:text-[16px]"
+                        href={item?.slug_en ? item?.slug_en : ""}
+                        target={
+                          window?.location?.host !== hostName ? "_blank" : ""
+                        }
+                      >
+                        {item?.menu_en}
+                      </Link>
+                    </li>
+                  );
+                })}
+            </ul>
+          </div>
+          <div className="col-span-3 lg:col-span-6 md:col-span-12 md:mb-0">
+            <ul className="flex flex-col gap-4 md:gap-1">
+              {altMenupressItems &&
+                altMenupressItems?.map((item, i) => {
+                  return (
+                    <li key={i}>
+                      <Link
+                        className="text-white p-[10px] md:py-[4px] md:px-0 text-[18px] md:text-[16px]"
+                        href={item?.slug_en ? item?.slug_en : ""}
+                      >
+                        {item?.menu_en}
+                      </Link>
+                    </li>
+                  );
+                })}
+            </ul>
+          </div>
+          <div className="col-span-3 lg:col-span-6 md:col-span-12">
+            <ul className="flex flex-col gap-4 md:gap-1">
+              {contact &&
+                contact?.map((cur, i) => (
+                  <li
+                    key={i}
+                    className="flex items-center md:items-start gap-3 text-white text-md"
+                  >
+                    {(cur?.id === 1 || cur?.id === 2 || cur?.id === 3) && (
+                      <h3 className="capitalize">
+                        {cur?.name}
+                        {(cur?.id === 2 || cur?.id === 3) && (
+                          <span className="pl-3">:</span>
+                        )}
+                      </h3>
+                    )}
+                    {cur?.id === 2 && (
+                      <a className="text-sm" href={`mailto:${cur?.mail}`}>
+                        {cur?.mail}
                       </a>
-                    </Link>
+                    )}
+                    {cur?.id === 3 && (
+                      <a
+                        href={`${cur?.link}`}
+                        className="text-sm "
+                        target="_blank"
+                      >
+                        {cur?.adres}
+                      </a>
+                    )}
+                    {cur?.id === 4 && (
+                      <div>
+                        <ul className="flex items-center gap-3  ">
+                          {cur?.sosicals?.map((item, i) => (
+                            <li key={i} className="text-white text-[25px]">
+                              <a
+                                href={item?.link}
+                                className="inline-block md:text-[20px]"
+                                target="_blank"
+                              >
+                                {item?.icon}
+                              </a>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </li>
                 ))}
-              </ul>
-            </div>
-          ))}
-          {/* İletişim Sütunu */}
-          <div className="col-span-4 xl:col-span-6 md:col-span-12">
-            <h3 className="text-sm font-semibold text-white uppercase tracking-wider">
-              Contact Us
-            </h3>
-            <ul className="mt-4 space-y-3">
-              <li>
-                <a
-                  href={`mailto:${footer?.sosials?.email}`}
-                  className="hover:text-[#ec5a44] transition-colors duration-300"
-                >
-                  {footer?.sosials?.email}
-                </a>
-              </li>
-              <li className="max-w-xs">
-                <a
-                  href={footer?.sosials?.map}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-[#ec5a44] transition-colors duration-300"
-                >
-                  {footer?.sosials?.unvan_en}
-                </a>
-              </li>
             </ul>
           </div>
         </div>
-
-        {/* Alt Kısım: Copyright ve Kredi */}
-        <div className="mt-16 pt-8 border-t border-slate-800 flex flex-col lg:gap-[2rem] justify-between items-center text-sm text-slate-500">
-          <p>© {year} Network of Azerbaijani Canadians. All rights reserved.</p>
-          <a
-            href="https://shamans.az/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 hover:text-white transition-colors duration-300 mt-4 sm:mt-0"
-          >
-            <span>Website by</span>
-            <Image
-              src={`${footer?.sosials?.shamans}`}
-              width={20}
-              height={20}
-              alt="Shamans"
-              className="object-contain"
-            />
-          </a>
+        <div className="flex justify-between w-full items-center py-[15px] px-[100px] xl:px-[50px] md:px-[20px]">
+          <h2 className="text-white text-lg md:text-sm">
+            All rights reserved © <span>{year}</span>
+          </h2>
+          <h2>
+            <a
+              href="https://shamans.az/"
+              target="_blank"
+              className="flex items-center gap-1 text-white text-xl  md:text-sm"
+            >
+              Website by
+              <Image
+                src={`${data?.sosials?.shamans}`}
+                width={100}
+                height={100}
+                alt="shamans"
+                className="w-[25px] h-[25px] object-contain"
+              />
+            </a>
+          </h2>
         </div>
-      </div>
-    </footer>
+      </footer>
+    </>
   );
 };
 

@@ -1,146 +1,127 @@
-"use client";
-
+import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  useDisclosure,
+  ChakraProvider,
+} from "@chakra-ui/react";
 import Image from "next/image";
 import { FaPlay } from "react-icons/fa";
-import { useVideoModal } from "../CustumYoutubeModal/useVideoModal";
-import CustumYoutubeModal from "../CustumYoutubeModal/CustumYoutubeModal";
+import { IoMdClose } from "react-icons/io";
 
-const AnimatedEditorialIntro = ({ dataSection1, dataCounter }) => {
-  // const stats = [
-  //   { id: 1, count: dataCounter?.events, title: "Organized Events" },
-  //   { id: 2, count: dataCounter?.parliament, title: "Chapters" },
-  //   { id: 3, count: dataCounter?.programs, title: "Page Audience" },
-  // ];
-
-  // const statsContainerRef = useRef(null);
-
-  // useEffect(() => {
-  //   const statsContainer = statsContainerRef.current;
-  //   if (!statsContainer) return;
-
-  //   // Her bir sayıyı canlandıracak fonksiyon
-  //   const animateCount = (element) => {
-  //     const target = parseInt(element.dataset.target, 10);
-  //     let current = 0;
-  //     const increment = target / 150; // Animasyon hızını ayarlar (daha büyük sayı = daha yavaş)
-
-  //     const updateCount = () => {
-  //       current += increment;
-  //       if (current < target) {
-  //         // Sayıyı yuvarlayıp, formatlayıp elemente yazdır
-  //         element.innerText = Math.ceil(current).toLocaleString("en-US");
-  //         requestAnimationFrame(updateCount); // Bir sonraki frame'de tekrar çalıştır
-  //       } else {
-  //         element.innerText = target.toLocaleString("en-US"); // Son değeri garantile
-  //       }
-  //     };
-
-  //     updateCount();
-  //   };
-
-  //   // Intersection Observer'ı oluştur
-  //   const observer = new IntersectionObserver(
-  //     (entries) => {
-  //       entries.forEach((entry) => {
-  //         // Element ekrana girdi mi?
-  //         if (entry.isIntersecting) {
-  //           // Tüm '.counter' elemanlarını bul ve animasyonu başlat
-  //           const counters = statsContainer.querySelectorAll(".counter");
-  //           counters.forEach(animateCount);
-
-  //           // Animasyon bir kere çalıştıktan sonra observer'ı durdur
-  //           observer.unobserve(entry.target);
-  //         }
-  //       });
-  //     },
-  //     {
-  //       threshold: 0.5, // Elementin en az %50'si göründüğünde tetikle
-  //     }
-  //   );
-
-  //   // Observer'ı istatistikler konteynerını izlemesi için başlat
-  //   observer.observe(statsContainer);
-
-  //   // Bileşen kaldırıldığında observer'ı temizle
-  //   return () => observer.disconnect();
-  // }, []);
-
-  const { isModalOpen, handleCloseModal, currentVideoUrl, containerRef } =
-    useVideoModal();
-
+const NOA = ({ dataSection1, dataCounter }) => {
+  const counter = [
+    {
+      id: 1,
+      color: "#ec5a44",
+      count: `${dataCounter?.events}`,
+      title: "organized events",
+    },
+    {
+      id: 2,
+      color: "#59a683",
+      count: `${dataCounter?.parliament}`,
+      title: "chapters",
+    },
+    {
+      id: 3,
+      color: "#7d63a7",
+      count: `${dataCounter?.programs}`,
+      title: "page audience",
+    },
+  ];
+  const { isOpen, onOpen, onClose } = useDisclosure();
   return (
-    <>
-      <div ref={containerRef} className="bg-gray-50 font-sans ">
-        <div className="container mx-auto px-4 py-8 2xl:px-[30px] md:px-[15px]">
-          <div className="grid grid-cols-12 gap-8 md:gap-0 items-center  ">
-            <div className="relative col-span-7 group lg:col-span-12">
-              <div className="rounded-2xl overflow-hidden shadow-lg">
-                <Image
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  width={1000}
-                  height={750}
-                  src={dataSection1?.section_one_src}
-                  alt="Azerbaijani Canadians community gathering"
-                />
-              </div>
-              <button
-                data-videolink={dataSection1?.section_one_video_link}
-                className="absolute play-button  top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-[#ec5a44] text-white rounded-full flex items-center justify-center shadow-lg transition-transform duration-300 hover:scale-110"
-              >
-                <FaPlay className="text-xl ml-1" />
-              </button>
-            </div>
-
-            <div className="col-span-5 lg:col-span-12 z-10 -ml-24 lg:ml-0 md:mt-[20px]">
-              <div className="bg-white rounded-2xl shadow-xl p-8 xl:p-4">
-                <div>
-                  <h3 className="text-gray-400 md:text-[14px] font-semibold tracking-widest uppercase">
-                    {dataSection1?.section_one_title_new_en}
-                  </h3>
-                  <h1 className="text-4xl xl:text-2xl md:text-[15px] font-bold text-gray-800 mt-2 leading-tight">
-                    {dataSection1?.section_one_title_1_en}
-                  </h1>
-                  <p
-                    className="mt-6 md:mt-2 text-base md:text-lg text-gray-600 leading-relaxed"
-                    dangerouslySetInnerHTML={{
-                      __html: dataSection1?.section_one_text_en,
-                    }}
-                  ></p>
-                </div>
-
-                {/* <div
-                  ref={statsContainerRef}
-                  className="mt-10 pt-8 border-t border-gray-200"
-                >
-                  <div className="flex justify-between items-start text-center max-md:flex-col max-md:text-left max-md:gap-6">
-                    {stats.map((item) => (
-                      <div key={item.id} className="px-2">
-                        <p
-                          className="counter text-4xl font-bold text-[#ec5a44]"
-                          data-target={item.count}
-                        >
-                          0
-                        </p>
-                        <p className="mt-1 text-sm text-gray-500 uppercase tracking-wider">
-                          {item.title}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </div> */}
-              </div>
+    <div className="noa">
+      <div className="relative mt-10 lg:mt-0 mb-16 px-[100px] 2xl:px-[50px] lg:p-[20px]">
+        <div className="grid grid-cols-12 gap-4">
+          <div className="col-span-6 lg:col-span-12  relative ">
+            <Image
+              className="w-full h-[450px] object-contain lg:h-auto"
+              width={1000}
+              height={400}
+              onClick={onOpen}
+              src={
+                dataSection1?.section_one_src || dataSection1?.section_one_src
+              }
+              alt=""
+            />
+            <span
+              onClick={onOpen}
+              className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] text-white cursor-pointer"
+            >
+              <FaPlay className="text-[35px]" />
+            </span>
+          </div>
+          <div className="col-span-6 lg:col-span-12 p-[40px] 2xl:p-[20px] lg:p-0">
+            <div className="flex items-start flex-col justify-center h-full">
+              <h2 className="font-bold text-4xl 2xl:text-2xl text-[#212529]">
+                {dataSection1?.section_one_title_1_en}
+              </h2>
+              <p
+                className="mt-[10px] text-lg w-[70%] xl:w-full"
+                dangerouslySetInnerHTML={{
+                  __html: dataSection1?.section_one_text_en,
+                }}
+              ></p>
             </div>
           </div>
         </div>
-
-        <CustumYoutubeModal
-          isOpen={isModalOpen}
-          onClose={handleCloseModal}
-          videoUrl={currentVideoUrl}
-        />
+        <div className=" mt-14 w-full">
+          <ul className="w-full grid grid-cols-12 gap-5">
+            {counter &&
+              counter?.map((cur, i) => (
+                <div
+                  key={i}
+                  className="col-span-4 lg:col-span-6 md:col-span-12  transition-all ease-out hover:scale-[1.04]"
+                >
+                  <li
+                    style={{ backgroundColor: cur?.color }}
+                    className="flex flex-col items-center justify-center gap-3 p-[25px] 2xl:p-[15px] text-center text-white rounded-xl"
+                  >
+                    <h2 className="font-bold text-4xl 2xl:text-2xl">
+                      {cur?.count}
+                    </h2>
+                    <span className="font-normal text-2xl 2xl:text-xl capitalize">
+                      {cur?.title}
+                    </span>
+                  </li>
+                </div>
+              ))}
+          </ul>
+        </div>
       </div>
-    </>
+      <ChakraProvider>
+        <Modal
+          isCentered
+          onClose={onClose}
+          isOpen={isOpen}
+          motionPreset="slideInBottom"
+          className=""
+        >
+          <ModalOverlay />
+          <ModalContent className="relative  ">
+            <span
+              onClick={onClose}
+              className="fixed right-[0px]  top-[-40px]  cursor-pointer text-white"
+            >
+              <IoMdClose className="text-[35px]" />
+            </span>
+            <ModalBody>
+              <iframe
+                className="w-full h-[400px]"
+                src={dataSection1?.section_one_video_link}
+              ></iframe>
+            </ModalBody>
+          </ModalContent>
+        </Modal>
+      </ChakraProvider>
+    </div>
   );
 };
 
-export default AnimatedEditorialIntro;
+export default NOA;

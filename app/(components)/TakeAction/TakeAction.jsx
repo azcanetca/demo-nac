@@ -1,86 +1,82 @@
-// components/TakeAction/TakeAction.js
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import GlobalBanner from "../GlobalBanner/GlobalBanner";
+import TakeComponnet from "./TakeComponnet";
+import Loading from "@/app/loading";
+import Transition from "../Transition/Transition";
 
-import CampaignCard from "./TakeComponnet";
-import SharedBanner from "../GlobalBanner/SharedBanner";
+const TakeAction = () => {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_API}/take`)
+      .then((res) => res.json())
+      .then((data) => setData(data))
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
 
-const TakeAction = ({ data }) => {
-  // 0 for 'Past', 1 for 'Current'
-  const [activeTab, setActiveTab] = useState(0);
+  const [activeDraft, setActiveDraft] = useState(0);
+  const filteredData = data?.take?.filter(
+    (item) => item?.draft === activeDraft
+  );
+  const [fadeOutClass, setFadeOutClass] = useState("");
+  const handleButtonClick = (draft) => {
+    setActiveDraft(draft);
+    setFadeOutClass("fadeOutNoa");
+    setTimeout(() => {
+      setFadeOutClass("");
+    }, 200);
+  };
 
-  const filteredData = data?.take?.filter((item) => item?.draft === activeTab);
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setFadeOutClass("");
+      window.scrollTo(0, 0);
+    }, 200);
 
-  const breadcrumbData = [
-    { name: "Home Page", link: "/" },
-    { name: "Take Action", link: "/take-action" },
-  ];
+    return () => clearTimeout(timeoutId);
+  }, [fadeOutClass]);
 
+  if (loading && !data?.take) return <Loading />;
   return (
     <>
-      <div>
-        <SharedBanner
-          images={data?.take_action?.take_action_banner_src}
-          pageNames={breadcrumbData}
-          title_en={data?.take_action?.take_action}
-          imgClass={`h-[380px] md:h-[250px]`}
-          justify="justify-start"
-        />
-      </div>
-
-      <section className="bg-slate-50 py-10 md:py-5">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 lg:mb-10">
-          {/* Modern Toggle Switch */}
-          <div className="flex justify-center  mb-12 md:mb-6">
-            <div className="inline-flex rounded-lg gap-[24px] shadow-sm bg-white p-1">
-              <button
-                type="button"
-                onClick={() => setActiveTab(1)}
-                className={`px-6 py-2 text-sm font-semibold outline-none rounded-md transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-[#ec5a44] focus:ring-offset-2 ${
-                  activeTab === 1
-                    ? "bg-[#ec5a44] text-white shadow"
-                    : "text-gray-600 hover:bg-slate-100"
-                }`}
-              >
-                Past
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveTab(0)}
-                className={`px-6 py-2 text-sm font-semibold outline-none rounded-md transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-[#ec5a44] focus:ring-offset-2 ${
-                  activeTab === 0
-                    ? "bg-[#ec5a44] text-white shadow"
-                    : "text-gray-600 hover:bg-slate-100"
-                }`}
-              >
-                Current
-              </button>
-            </div>
-          </div>
-
-          {/* Campaign Cards List */}
-          <div className=" grid grid-cols-12 gap-[24px]">
-            {filteredData && filteredData.length > 0 ? (
-              filteredData.map((item, index) => (
-                <CampaignCard
-                  key={item.id}
-                  data={item}
-                  index={index}
-                  pageName="take-action"
-                />
-              ))
-            ) : (
-              <div className="text-center py-12 col-span-12">
-                <h3 className="text-2xl font-semibold text-gray-700">
-                  No campaigns to show.
-                </h3>
-                <p className="mt-2 text-gray-500">Please check back later.</p>
-              </div>
-            )}
-          </div>
+      <Transition>
+        <div className="mb-4">
+          <GlobalBanner
+            longtext={data?.take_action?.take_action_banner_title_en}
+            bgColor={data?.section_bg}
+            images={data?.take_action?.take_action_banner_src}
+          />
         </div>
-      </section>
+        <div className="px-[100px] py-[20px] 2xl:px-[50px] lg:p-[20px]">
+          <div className="flex items-center justify-center gap-4">
+            <button
+              className={`text-white font-semibold rounded-md uppercase p-3 ${
+                activeDraft === 0 ? "bg-[#adc4e6]" : "bg-[#759acd]"
+              }`}
+              type="button"
+              onClick={() => handleButtonClick(0)}
+            >
+              past
+            </button>
+            <button
+              className={`text-white font-semibold rounded-md uppercase p-3 ${
+                activeDraft === 1 ? "bg-[#adc4e6]" : "bg-[#759acd]"
+              }`}
+              type="button"
+              onClick={() => handleButtonClick(1)}
+            >
+              current
+            </button>
+          </div>
+          {filteredData?.map((item) => (
+            <TakeComponnet key={item?.id} data={item} fade={fadeOutClass} />
+          ))}
+        </div>
+      </Transition>
     </>
   );
 };

@@ -1,5 +1,6 @@
 "use client";
 
+import Loading from "@/app/loading";
 import { useEffect, useState } from "react";
 import Breadcrumb from "../Breadcrumb/Breadcrumb";
 import GlobalBanner from "../GlobalBanner/GlobalBanner";

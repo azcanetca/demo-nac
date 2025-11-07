@@ -1,49 +1,97 @@
-import SharedBanner from "../GlobalBanner/SharedBanner";
+"use client";
 
-// Bileşenin adını daha standart bir hale getirelim: CurrentIssuesPage
-const CurrentIssuesPage = ({ data }) => {
-  // Breadcrumb verisini doğrudan bileşen içinde tanımlayalım
+import { useEffect, useState } from "react";
+import Breadcrumb from "../Breadcrumb/Breadcrumb";
+import Image from "next/image";
+import Tabs from "@/app/Tab/Tab";
+import Share from "../Share/Share";
+import { CopyNotification } from "../CopyNotification/CopyNotification";
+import Loading from "@/app/loading";
+import Transition from "../Transition/Transition";
+
+const CurrentIsuses = () => {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_API}/current-isuses`)
+      .then((res) => res.json())
+      .then((data) => setData(data))
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
+  const [showNotification, setShowNotification] = useState(false);
+  const [copiedLink, setCopiedLink] = useState("");
+
   const pageNames = [
     {
-      name: "Home Page",
+      name: "Home page",
       link: "/",
     },
     {
-      // Mevcut sayfanın adı dinamik olarak veriden gelmeli
-      name: data?.name_en,
-      link: "#", // Mevcut sayfa linki genellikle # olur
+      name: "current Isuses",
+      link: "#",
     },
   ];
 
-  return (
-    // Ana sarmalayıcı, pt-[80px] yerine doğrudan padding kullanalım
-    <div className="bg-white">
-      <SharedBanner
-        images={data?.image}
-        pageNames={pageNames}
-        title_en={data?.title_en}
-        alt={data?.name_en}
-        imgClass="h-[500px] 2xl:h-[400px] md:h-[300px]"
-        hiddenclass={`md:hidden`}
-      />
+  const href = `${process.env.NEXT_PUBLIC_LINK}/current-issues`;
 
-      {/* Makale İçeriği Bölümü */}
-      <main className="md:py-6 py-12">
-        <div className="container mx-auto 2xl:px-[40px] md:px-[15px]">
-          <h2 className="hidden md:flex  mb-4 text-4xl  md:text-lg text-black font-bold tracking-tight">
-            {data?.title_en}
-          </h2>
-          <article
-            className=" tab-content mx-auto md:text-[14px]
-                       "
-            dangerouslySetInnerHTML={{
-              __html: `${data?.text_en}`,
-            }}
-          />
+  const CopyLinkTitle = () => {
+    const link = window?.location?.href;
+    setCopiedLink(link);
+    setShowNotification(true);
+    navigator?.clipboard?.writeText(link);
+    setTimeout(() => {
+      setShowNotification(false);
+    }, 3000);
+  };
+  if (loading && !data?.currentctg) return <Loading />;
+
+  return (
+    <>
+      <Transition>
+        <Breadcrumb pageNames={pageNames} />
+        <Image
+          src={data?.currentIsuses}
+          width={1000}
+          height={300}
+          alt=""
+          className="w-full h-[350px] lg:h-[250px] object-cover"
+        />
+        <div className="px-[150px] 2xl:px-[50px] lg:px-[20px]">
+          <div className="mt-[20px]">
+            <Tabs>
+              {data?.currentctg?.map((data) => (
+                <Tabs.Panel key={data?.id} title={data?.name_en}>
+                  <div className="pt-[50px]">
+                    <p
+                      className="font-[700] text-[35px] lg:text-[20px] md:text-[16px] tracking-[0.7px] text-[#212529]"
+                      dangerouslySetInnerHTML={{
+                        __html: data && data?.title_en,
+                      }}
+                    ></p>
+                    <div
+                      className="tab-content lg:text-[13px] "
+                      dangerouslySetInnerHTML={{
+                        __html: data && data?.text_en,
+                      }}
+                    ></div>
+                  </div>
+                  <Share
+                    copyLink={CopyLinkTitle}
+                    href={href}
+                    title={data?.name_en}
+                  />
+                </Tabs.Panel>
+              ))}
+            </Tabs>
+          </div>
+
+          {showNotification && <CopyNotification link={copiedLink} />}
         </div>
-      </main>
-    </div>
+      </Transition>
+    </>
   );
 };
 
-export default CurrentIssuesPage;
+export default CurrentIsuses;

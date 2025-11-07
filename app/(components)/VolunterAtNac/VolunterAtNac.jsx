@@ -1,6 +1,23 @@
-import SharedBanner from "../GlobalBanner/SharedBanner";
+"use client";
 
-const VolunterAtNac = ({ data }) => {
+import Loading from "@/app/loading";
+import { useEffect, useState } from "react";
+import Breadcrumb from "../Breadcrumb/Breadcrumb";
+import GlobalBanner from "../GlobalBanner/GlobalBanner";
+import Transition from "../Transition/Transition";
+
+const VolunterAtNac = () => {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_API}/volunter_nac`)
+      .then((res) => res.json())
+      .then((data) => setData(data))
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
+
   const pageNames = [
     {
       name: "Home page",
@@ -12,26 +29,27 @@ const VolunterAtNac = ({ data }) => {
     },
   ];
 
+  if (loading && !data?.volunter_nac) return <Loading />;
   return (
     <>
-      <div className="pt-[68px] md:pt-[63px] bg-gray-50">
-        <SharedBanner
-          images={data?.volunteer_banner_src}
-          pageNames={pageNames}
-          title_en={data?.volunteer_banner_m_text_en}
-          imgClass={`h-[380px] md:h-[280px]`}
-          justify="justify-start lg:items-start "
-        />
-      </div>
-
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 ">
+      <Transition>
+        <div className="mt-16">
+          <Breadcrumb pageNames={pageNames} />
+        </div>
+        <div className="mb-4">
+          <GlobalBanner
+            longtext={data?.volunteer_banner_m_text_en}
+            bgColor={data?.section_bg}
+            images={data?.volunteer_banner_src}
+          />
+        </div>
         <div
-          className=" tab-content media md:text-sm py-[30px]"
+          className="py-[30px] px-[100px] 2xl:px-[50px] lg:px-[20px] tab-content media md:text-sm"
           dangerouslySetInnerHTML={{
-            __html: `${data?.volunteer_banner_title_en}`,
+            __html: data?.volunteer_banner_title_en,
           }}
         />
-      </div>
+      </Transition>
     </>
   );
 };

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Breadcrumb from "../Breadcrumb/Breadcrumb";
 import CommonDataInenr from "./CommonDataInenr";
-
+import Loading from "@/app/loading";
 import Transition from "../Transition/Transition";
 
 const StatmentsSlig = ({ params }) => {

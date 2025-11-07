@@ -1,53 +1,63 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Breadcrumb from "../Breadcrumb/Breadcrumb";
 import NOA from "./NOA";
+import Loading from "@/app/loading";
 import WeAreAbout from "./WeAreAbout";
 import WeAreSomeMoments from "./WeAreSomeMoments";
 import WeAreWhatCanYou from "./WeAreWhatCanYou";
+import Transition from "../Transition/Transition";
 
-const WeAreNac = ({ wearewnac }) => {
-  const breadcrumbData = [
-    { name: `${wearewnac?.home_page}`, link: "/" },
-    { name: `${wearewnac?.we_are_nac}`, link: "/we-are-nac" },
+const WeAreNac = () => {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_API}/wearewnac`)
+      .then((res) => res.json())
+      .then((data) => setData(data))
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
+
+  const pageNames = [
+    {
+      name: "Home page",
+      link: "/",
+    },
+    {
+      name: "We are nac",
+      link: "#",
+    },
   ];
+
+  if (loading && !data?.moments) return <Loading />;
 
   return (
     <>
-      <div className="pt-[105px] lg:pt-[80px]">
-        <Breadcrumb
-          pageNames={breadcrumbData}
-          customClass="2xl:px-[30px] md:px-[10px]"
-          pageTitle={wearewnac?.we_are_nac}
-        />
-        <NOA
-          dataSection1={wearewnac?.section_1}
-          // dataCounter={wearewnac?.counter}
-        />
-        <WeAreAbout
-          our_story={wearewnac?.our_story}
-          title={wearewnac?.section_2?.section_two_title_1_en}
-          text={wearewnac?.section_2?.section_two_text_en}
-          url={wearewnac?.section_2?.section_two_src}
-          bg={wearewnac?.section_2?.section_two_bg}
-        />
-        <WeAreAbout
-          our_story={wearewnac?.our_vision}
-          title={wearewnac?.section_3_4?.section_three_title_1_en}
-          title2={wearewnac?.section_3_4?.section_four_title_1_en}
-          text={wearewnac?.section_3_4?.section_three_text_en}
-          text2={wearewnac?.section_3_4?.section_four_text_en}
-          url={wearewnac?.section_3_4?.section_three_src}
-          bg={wearewnac?.section_3_4?.section_three_bg}
-          order="order-first md:order-last"
-        />
-        <WeAreSomeMoments
-          data={wearewnac?.moments}
-          text1={wearewnac?.some_moments_of_nac}
-        />
-        <WeAreWhatCanYou
-          data={wearewnac?.all}
-          learn_more={wearewnac?.learn_more2}
-        />
-      </div>
+      <Transition>
+        <div className="pt-[65px]">
+          <Breadcrumb pageNames={pageNames} />
+          <NOA dataSection1={data?.section_1} dataCounter={data?.counter} />
+          <WeAreAbout
+            title={data?.section_2?.section_two_title_1_en}
+            text={data?.section_2?.section_two_text_en}
+            url={data?.section_2?.section_two_src}
+            bg={data?.section_2?.section_two_bg}
+          />
+          <WeAreAbout
+            title={data?.section_3_4?.section_three_title_1_en}
+            title2={data?.section_3_4?.section_four_title_1_en}
+            text={data?.section_3_4?.section_three_text_en}
+            text2={data?.section_3_4?.section_four_text_en}
+            url={data?.section_3_4?.section_three_src}
+            bg={data?.section_3_4?.section_three_bg}
+          />
+          <WeAreSomeMoments data={data?.moments} />
+          <WeAreWhatCanYou data={data?.all} />
+        </div>
+      </Transition>
     </>
   );
 };

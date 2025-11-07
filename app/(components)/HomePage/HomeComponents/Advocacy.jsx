@@ -1,102 +1,97 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
+import { FaAngleDown } from "react-icons/fa";
 
-const Advocacy = ({ advocacyData }) => {
-  if (
-    !advocacyData ||
-    (Array.isArray(advocacyData) && advocacyData.length === 0)
-  ) {
-    return null; // Bu komut, bileşenin hiçbir şey render etmemesini sağlar.
-  }
+const Advocacy = () => {
+  const [data, setData] = useState([]);
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_API}/advocacy`)
+      .then((res) => res.json())
+      .then((data) => setData(data));
+  }, []);
 
-  const {
-    title_1_en,
-    title_2_en,
-    text_en,
-    src,
-    link,
-    title_our_advocacy_1,
-    title_our_advocacy_2,
-    title_our_advocacy_3,
-  } = advocacyData;
+  const targetSlug = "our-advocacy";
+  const press_menu = useRef();
+  const pressCentreItem = data?.header?.find(
+    (item) => item?.slug_en === targetSlug
+  );
+
+  const altMenuItems = pressCentreItem ? pressCentreItem?.alt_menu : [];
+
+  const openPressMenu = () => {
+    press_menu?.current?.classList?.toggle("hidden");
+  };
 
   return (
-    // 1. Arka plan rengini daha sıcak ve premium bir tona (taş rengi) çevirdik.
-    //    Daha fazla "nefes alma alanı" için dikey boşluğu (py) artırdık.
-    <section className="bg-stone-50 py-24 lg:py-12 md:py-6 overflow-hidden relative">
-      <div className="container mx-auto px-4 2xl:max-w-full 2xl:px-[20px]">
-        {/* 2. Arka plan yazısını daha büyük, daha soluk ve temayla alakalı hale getirdik. */}
-        <div className=" flex  z-0">
-          <div className="select-none">
-            <span className="block uppercase absolute left-[4rem] text-[16rem] lg:text-[8rem]  font-black text-stone-200/70 whitespace-nowrap leading-none">
-              {title_our_advocacy_1}
-            </span>
-            <h3 className="block absolute uppercase right-[2rem] bottom-10 text-[14rem] lg:text-[8rem]  font-black text-stone-200/70 whitespace-nowrap leading-none ">
-              {title_our_advocacy_2}
-            </h3>
-          </div>
-        </div>
-
-        {/* Sütunları dikey olarak ortaladık (items-center) */}
-        <div className="relative flex flex-col  items-center gap-x-12 gap-y-16">
-          {/* Sol Taraf: Metin İçeriği (Daha dar bir alana aldık) */}
-          <div className=" w-full text-center  z-10">
-            {/* 3. Üst başlığı daha zarif hale getirdik: harf aralığı artırıldı, renk yumuşatıldı. */}
-            <span className="font-semibold text-red-500 uppercase tracking-widest text-sm">
-              {title_1_en}
-            </span>
-            <h2 className="mt-3 text-4xl lg:text-2xl font-extrabold text-gray-900 leading-tight">
-              {title_2_en}
-            </h2>
-            <div
-              className="mt-6 prose prose-lg max-w-none lg:text-[14px] text-gray-700 mx-auto lg:mx-0"
-              dangerouslySetInnerHTML={{ __html: `${text_en}` }}
+    <>
+      <div className="md:pt-5">
+        <div className="relative">
+          <Image
+            src={data?.advocacy?.src}
+            width={1000}
+            height={400}
+            alt="involve banner"
+            className="!w-full h-[650px] object-cover lg:h-[400px] md:hidden"
+          />
+          <div className="hidden md:block ">
+            <Image
+              src={data?.advocacy?.src_mobile}
+              width={1000}
+              height={400}
+              alt="involve banner"
+              className="!w-full h-[650px] object-cover lg:h-[400px]   "
             />
-            <div className="mt-10">
-              {/* 4. Butonu daha interaktif ve şık hale getirdik: ikon eklendi ve hover efekti geliştirildi. */}
-              <Link href={`${link}`} legacyBehavior>
-                <a className="group inline-flex items-center gap-x-3 bg-[#ec5a44] text-white font-bold py-4 px-8 rounded-lg shadow-lg hover:bg-red-700 transition-all duration-300 transform hover:-translate-y-1">
-                  <span>{title_our_advocacy_3}</span>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M17 8l4 4m0 0l-4 4m4-4H3"
-                    />
-                  </svg>
-                </a>
-              </Link>
-            </div>
           </div>
-
-          {/* Sağ Taraf: Görsel Alanı (Görsel için daha geniş bir alan ayırdık) */}
-          <div className=" w-full flex justify-center">
-            {/* 5. Görsel sunumunu tamamen değiştirdik. Daha kasıtlı ve mimari bir his veriyor. */}
-            <div className="relative w-full max-w-lg">
-              {/* Arkadaki renkli "çerçeve" katmanı */}
-              <div className="absolute top-0 left-0 w-[95%] h-[95%] bg-stone-200 rounded-lg"></div>
-              {/* Öndeki asıl görsel. Hafifçe kaydırılmış ve gölgeli. */}
-              <div className="relative transform translate-x-4 -translate-y-4 md:translate-x-0 md:translate-y-0">
-                <Image
-                  src={src}
-                  width={800}
-                  height={700}
-                  alt={title_2_en}
-                  className="w-full h-auto object-cover rounded-lg shadow-2xl"
-                />
+          <div className="absolute w-[40%] md:w-full lg:w-full top-[50%] flex justify-end  flex-col right-[0%] lg:px-[30px]  md:mt-5 md:mb-5 translate-x-[0%] md:static translate-y-[-50%] md:translate-y-[0] text-black md:px-[30px]">
+            <span className="font-normal  text-[24px] lg:text-[18px]">
+              {data?.advocacy?.title_1_en}
+            </span>
+            <h2 className="font-bold text-4xl mt-2 lg:text-xl">
+              {data?.advocacy?.title_2_en}
+            </h2>
+            <p
+              className="font-[400] text-[15px]  py-[1rem] pr-3 mt-3 "
+              dangerouslySetInnerHTML={{
+                __html: data && data?.advocacy?.text_en,
+              }}
+            ></p>
+            <div className="relative ">
+              <div
+                onClick={openPressMenu}
+                className="flex items-center gap-3 bg-[#ec5a44] w-fit px-2 py-3 cursor-pointer rounded-lg text-white"
+              >
+                <h1 className=" text-[16px] uppercase  font-semibold ">
+                  take action
+                </h1>
+                <FaAngleDown />
               </div>
+              <ul
+                ref={press_menu}
+                className="absolute bottom-[-125px] lg:bottom-auto lg:top-[-130px] lg:border-[1px] bg:border-[#ccc] left-0 right-0 lg:bg-[#f6f6f6] bg-white w-fit hidden transition-all "
+              >
+                {altMenuItems &&
+                  altMenuItems?.map((item, i) => (
+                    <li
+                      className="text-black cursor-pointer hover:bg-[#ec5a44] w-full  h-full flex  transition-all hover:text-white"
+                      key={i}
+                    >
+                      <Link
+                        className="w-full h-full px-2 py-2"
+                        href={item?.slug_en ? item?.slug_en : ""}
+                      >
+                        {item?.menu_en}
+                      </Link>
+                    </li>
+                  ))}
+              </ul>
             </div>
           </div>
         </div>
       </div>
-    </section>
+    </>
   );
 };
 

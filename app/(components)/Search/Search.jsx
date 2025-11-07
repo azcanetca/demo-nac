@@ -1,47 +1,49 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { nanoid } from "nanoid";
 import { FaAnglesDown, FaAnglesUp } from "react-icons/fa6";
 import Link from "next/link";
-
+import Loading from "@/app/loading";
 import Transition from "../Transition/Transition";
 import Image from "next/image";
 
 const Search = () => {
-  // const searchParams = useSearchParams();
-  // const query = searchParams?.get("q");
-  // const [loading, setLoading] = useState(true);
-  // const [blogs, setBlogs] = useState([]);
-  // const [results, setResults] = useState([]);
-  // const [selectedItem, setSelectedItem] = useState(null);
-  // const searchTab = useRef();
+  const searchParams = useSearchParams();
+  const query = searchParams?.get("q");
+  const [loading, setLoading] = useState(true);
+  const [blogs, setBlogs] = useState([]);
+  const [results, setResults] = useState([]);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const searchTab = useRef();
 
-  // useEffect(() => {
-  //   fetch(`${process.env.NEXT_PUBLIC_API}/search`)
-  //     .then((res) => res.json())
-  //     .then((data) => setBlogs(data));
-  // }, [query]);
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_API}/search`)
+      .then((res) => res.json())
+      .then((data) => setBlogs(data));
+  }, [query]);
 
-  // useEffect(() => {
-  //   if (query !== "") {
-  //     let filterData = blogs?.filter((i) => {
-  //       return i?.title_en?.toLowerCase()?.includes(query)
-  //         ? i?.title_en?.toLowerCase()?.includes(query)
-  //         : i?.intro_text_en?.toLowerCase()?.includes(query);
-  //     });
-  //     setTimeout(() => {
-  //       if (filterData?.length > 0) {
-  //         setResults(filterData);
-  //       } else {
-  //         setResults([]);
-  //       }
-  //       setLoading(false);
-  //     }, 1000);
-  //   } else {
-  //     setResults([]);
-  //   }
-  // }, [query, blogs]);
+  useEffect(() => {
+    if (query !== "") {
+      let filterData = blogs?.filter((i) => {
+        return i?.title_en?.toLowerCase()?.includes(query)
+          ? i?.title_en?.toLowerCase()?.includes(query)
+          : i?.intro_text_en?.toLowerCase()?.includes(query);
+      });
+      setTimeout(() => {
+        if (filterData?.length > 0) {
+          setResults(filterData);
+        } else {
+          setResults([]);
+        }
+        setLoading(false);
+      }, 1000);
+    } else {
+      setResults([]);
+    }
+  }, [query, blogs]);
 
+  if (loading || !blogs) return <Loading />;
   return (
     <Transition>
       <div className="mt-24 min-h-[60vh]">
@@ -57,6 +59,8 @@ const Search = () => {
           )}
 
           {results?.map((cur, i) => {
+            console.log("a", cur);
+
             return (
               <div
                 key={i}
