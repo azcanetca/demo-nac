@@ -1,4 +1,5 @@
-import BecomeAMember from "@/app/(components)/BecomeAMember/BecomeAMember";
+import Become from "@/app/(components)/Become/Become";
+
 import { generateKeywordsFromWords } from "@/app/(components)/seo/seo";
 
 import Footer from "@/app/(layout)/Footer/Footer";
@@ -6,7 +7,7 @@ import Header from "@/app/(layout)/Header/Header";
 import { fetchData } from "@/app/fetch/fetchData";
 
 const getData = async () => {
-  const become = await fetchData("become-a-member");
+  const become = await fetchData("become_a_member");
   const header = await fetchData("header");
   const nac_footer = await fetchData("nac_footer");
   const settingsData = await fetchData("settings");
@@ -16,7 +17,7 @@ const getData = async () => {
 export async function generateMetadata() {
   try {
     const { settingsData, become } = await getData();
-    const baseUrl = `${process.env.NEXT_DOAMIN_REAL}`;
+
     const logoUrl = `${become?.become_a_member_banner_src}`;
     const faviconUrl = `${settingsData?.settings?.favicon}`;
     const generatedKeywords = generateKeywordsFromWords(
@@ -64,7 +65,7 @@ export default async function page() {
   return (
     <>
       <Header data={header} footer={nac_footer} settings={settingsData} />
-      <BecomeAMember data={become} />
+      <Become data={become} />
       <Footer footer={nac_footer} />
     </>
   );
