@@ -7,7 +7,7 @@ import Press from "./HomeComponents/Press";
 const HomePage = ({ data }) => {
   return (
     <>
-      <Carousel data={data} />
+      {/* <Carousel data={data} /> */}
       <Mission />
       <Advocacy />
       <Press />
